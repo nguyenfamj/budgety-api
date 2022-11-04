@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/budget
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+  db:
+    image: postgres:14.4-alpine
+    environment:
+      POSTGRES_USER: rootuser
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: budget
+    ports:
+      - 5432:5432
+    volumes:
+      - budget-data:/var/lib/postgresql/data
+volumes:
+  budget-data:
