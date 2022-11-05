@@ -2,17 +2,13 @@ package com.example.budget;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+
+import com.example.budget.config.RsaKeyProperties;
 
 @SpringBootApplication
-@RestController
+@EnableConfigurationProperties(RsaKeyProperties.class)
 public class BudgetApplication {
-
-	@RequestMapping("/")
-	public String index() {
-		return "Hello Docker";
-	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(BudgetApplication.class, args);
