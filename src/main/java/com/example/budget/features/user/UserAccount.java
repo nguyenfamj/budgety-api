@@ -1,9 +1,19 @@
 package com.example.budget.features.user;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import com.example.budget.features.account.Account;
+import com.example.budget.features.transaction.category.Category;
+import com.example.budget.features.transaction.payee.Payee;
+
 import javax.persistence.GenerationType;
 
 @Entity
@@ -28,6 +38,15 @@ public class UserAccount {
 
     @Column(name = "role", nullable = false)
     private String role;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
+    private List<Account> accounts;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.LAZY)
+    private List<Category> categories;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.LAZY)
+    private List<Payee> payees;
 
     public UserAccount() {
     }
@@ -59,6 +78,18 @@ public class UserAccount {
 
     public String getRole() {
         return this.role;
+    }
+
+    public List<Account> getAccounts() {
+        return this.accounts;
+    }
+
+    public List<Category> getCategories() {
+        return this.categories;
+    }
+
+    public List<Payee> getPayees() {
+        return this.payees;
     }
 
     public void setUserName(String userName) {
