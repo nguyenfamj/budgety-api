@@ -6,6 +6,11 @@ services:
       dockerfile: Dockerfile
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/budget
+      - SPRING_DATASOURCE_USERNAME=rootuser
+      - SPRING_DATASOURCE_PASSWORD=rootpassword
+      - APP_JWT_COOKIE_NAME=budgetapp
+      - APP_JWT_SECRET_KEY=budgetappsecret123
+      - APP_JWT_EXPIRATION_TIME=8640000
     ports:
       - 8080:8080
     depends_on:

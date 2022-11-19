@@ -1,7 +1,12 @@
 package com.example.budget.features.user;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.Optional;
 
-public interface UserAccountRepository extends CrudRepository<UserAccount, Long> {
-    UserAccount findByUserName(String userName);
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserAccountRepository extends JpaRepository<UserAccount, Long> {
+    Optional<UserAccount> findByUserName(String userName);
+
+    Boolean existsByUserName(String userName);
+
 }

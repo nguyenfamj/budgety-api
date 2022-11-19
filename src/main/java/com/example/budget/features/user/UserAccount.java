@@ -1,6 +1,8 @@
 package com.example.budget.features.user;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -8,9 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import com.example.budget.features.account.Account;
+import com.example.budget.features.role.Role;
 import com.example.budget.features.transaction.category.Category;
 import com.example.budget.features.transaction.payee.Payee;
 
@@ -34,10 +40,11 @@ public class UserAccount {
     private String lastName;
 
     @Column(name = "hashed_password", nullable = false)
-    private String hashedPassword;
+    private String password;
 
-    @Column(name = "role", nullable = false)
-    private String role;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
     private List<Account> accounts;
@@ -51,13 +58,15 @@ public class UserAccount {
     public UserAccount() {
     }
 
-    public UserAccount(String userName, String firstName, String lastName, String hashedPassword, String role) {
-        super();
+    public UserAccount(String userName, String firstName, String lastName, String password) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.hashedPassword = hashedPassword;
-        this.role = role;
+        this.password = password;
+    }
+
+    public Long getUserId() {
+        return this.userId;
     }
 
     public String getUserName() {
@@ -72,12 +81,12 @@ public class UserAccount {
         return this.lastName;
     }
 
-    public String getHashedPassword() {
-        return this.hashedPassword;
+    public String getPassword() {
+        return this.password;
     }
 
-    public String getRole() {
-        return this.role;
+    public Set<Role> getRoles() {
+        return this.roles;
     }
 
     public List<Account> getAccounts() {
@@ -104,11 +113,11 @@ public class UserAccount {
         this.lastName = lastName;
     }
 
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }
