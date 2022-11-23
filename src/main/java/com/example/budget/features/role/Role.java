@@ -20,7 +20,7 @@ public class Role {
     private long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(length = 20, unique = true)
     private RoleEnum type;
 
     public Role() {

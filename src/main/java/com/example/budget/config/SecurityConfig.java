@@ -80,7 +80,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors().and().csrf(csrf -> csrf.disable()).exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
+        http.cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
                 .and()
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests(auth -> auth.antMatchers("/auth/login", "/auth/register").permitAll()

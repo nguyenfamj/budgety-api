@@ -1,7 +1,16 @@
 package com.example.budget.features.account;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
 
-public interface AccountRepository extends CrudRepository<Account, Long> {
+import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.example.budget.features.user.UserAccount;
+
+public interface AccountRepository extends JpaRepository<Account, Long> {
+
+    List<Account> findByUserAccount(UserAccount userAccount);
+
+    Account findByAccountId(Long accountId);
+
+    Boolean existsByUserAccount(UserAccount userAccount);
 }

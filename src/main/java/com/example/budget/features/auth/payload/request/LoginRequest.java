@@ -1,10 +1,10 @@
-package com.example.budget.features.auth.dto;
+package com.example.budget.features.auth.payload.request;
 
-public class LoginDto {
+public class LoginRequest {
     private String userName;
     private String password;
 
-    public LoginDto(String userName, String password) {
+    public LoginRequest(String userName, String password) {
         this.userName = userName;
         this.password = password;
     }

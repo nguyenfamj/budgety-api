@@ -19,6 +19,7 @@ import com.example.budget.features.account.Account;
 import com.example.budget.features.role.Role;
 import com.example.budget.features.transaction.category.Category;
 import com.example.budget.features.transaction.payee.Payee;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.GenerationType;
 
@@ -39,6 +40,7 @@ public class UserAccount {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @JsonIgnore
     @Column(name = "hashed_password", nullable = false)
     private String password;
 
@@ -46,7 +48,7 @@ public class UserAccount {
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER, orphanRemoval = true)
     private List<Account> accounts;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.LAZY)
@@ -59,6 +61,19 @@ public class UserAccount {
     }
 
     public UserAccount(String userName, String firstName, String lastName, String password) {
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+    }
+
+    public void updateUserWithoutPassword(String userName, String firstName, String lastName) {
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    public void updateUserWithPassword(String userName, String firstName, String lastName, String password) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;

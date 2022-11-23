@@ -1,8 +1,11 @@
 package com.example.budget.features.auth;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
@@ -22,9 +26,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.budget.features.auth.dto.LoginDto;
-import com.example.budget.features.auth.response.LoginResponse;
+import com.example.budget.features.auth.payload.request.LoginRequest;
+import com.example.budget.features.auth.payload.request.RegisterRequest;
+import com.example.budget.features.auth.payload.response.LoginResponse;
+import com.example.budget.features.auth.payload.response.ServerResponse;
+import com.example.budget.features.role.Role;
+import com.example.budget.features.role.RoleEnum;
 import com.example.budget.features.role.RoleRepository;
+import com.example.budget.features.user.UserAccount;
 import com.example.budget.features.user.UserAccountRepository;
 import com.example.budget.security.jwt.JwtUtils;
 import com.example.budget.services.UserDetails.UserDetailsImpl;
@@ -36,56 +45,90 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class AuthController {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+        @Autowired
+        AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UserAccountRepository userAccountRepository;
+        @Autowired
+        private UserAccountRepository userAccountRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
+        @Autowired
+        private RoleRepository roleRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+        @Autowired
+        private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    JwtUtils jwtUtils;
+        @Autowired
+        JwtUtils jwtUtils;
 
-    public AuthController() {
-    }
+        public AuthController() {
+        }
 
-    @GetMapping("")
-    public String index() {
-        return "Welcome to the personal budget application!";
-    }
+        @GetMapping("")
+        @PreAuthorize("hasRole('ROLE_ADMIN')")
+        public String index() {
+                return "Welcome to the personal budget application!";
+        }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginDto loginDto) {
-        // Authenticate user
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUserName(), loginDto.getPassword()));
+        @PostMapping("/login")
+        public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+                // Authenticate user
+                Authentication authentication = authenticationManager
+                                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUserName(),
+                                                loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.info("Username: {}", loginRequest.getUserName());
 
-        log.info("New LOG:", authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+                log.info("New LOG: {}", authentication);
 
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+                UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
+                log.info("Username: {}", userDetails.getUsername());
 
-        log.debug(jwtCookie);
+                ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setUserId(userDetails.getUserId());
-        loginResponse.setFirstName(userDetails.getFirstName());
-        loginResponse.setLastName(userDetails.getLastName());
-        loginResponse.setRoles(roles);
+                List<String> roles = userDetails.getAuthorities().stream()
+                                .map(item -> item.getAuthority())
+                                .collect(Collectors.toList());
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(loginResponse);
-    }
+                log.debug("Log:{}", jwtCookie);
 
+                LoginResponse loginResponse = new LoginResponse(userDetails.getUserId(), userDetails.getUsername(),
+                                userDetails.getFirstName(), userDetails.getLastName(), roles);
+
+                return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(loginResponse);
+        }
+
+        @PostMapping("/register")
+        public ResponseEntity<?> registerNormalUser(@Valid @RequestBody RegisterRequest registerRequest) {
+                if (userAccountRepository.existsByUserName(registerRequest.getUserName())) {
+                        return ResponseEntity.badRequest().body(new ServerResponse(HttpServletResponse.SC_NOT_FOUND,
+                                        "Error: Username cannot be used, please pick another one and try again!"));
+                }
+
+                // Create new user based on the request
+                UserAccount user = new UserAccount(registerRequest.getUserName(), registerRequest.getFirstName(),
+                                registerRequest.getLastName(), passwordEncoder.encode(registerRequest.getPassword()));
+
+                log.info(registerRequest);
+
+                Set<Role> roles = new HashSet<>();
+
+                // Set role User as a default for new user in this register api path
+                // /api/v1/auth/register
+                Role userRole = roleRepository.findByType(RoleEnum.ROLE_USER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found in the database"));
+
+                roles.add(userRole);
+                user.setRoles(roles);
+
+                // Save user in the database
+                userAccountRepository.save(user);
+
+                // Response
+                return ResponseEntity
+                                .ok(new ServerResponse(HttpServletResponse.SC_OK, "User registered", user.getUserName(),
+                                                user.getFirstName(), user.getLastName()));
+        }
 }

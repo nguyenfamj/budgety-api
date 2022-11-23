@@ -30,7 +30,7 @@ public class Payee {
     @JoinColumn(name = "user_id")
     private UserAccount userAccount;
 
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "category", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "payee", fetch = FetchType.LAZY)
     private List<Transaction> transactions;
 
     public Payee() {

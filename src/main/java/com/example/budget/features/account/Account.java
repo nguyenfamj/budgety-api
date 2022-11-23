@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 
 import com.example.budget.features.transaction.Transaction;
 import com.example.budget.features.user.UserAccount;
@@ -32,11 +33,11 @@ public class Account {
     private BigDecimal accountBalance;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "user_id")
     private UserAccount userAccount;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "account", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "transactionId", fetch = FetchType.EAGER)
     private List<Transaction> transactions;
 
     public Account() {
@@ -47,7 +48,12 @@ public class Account {
         this.accountName = accountName;
         this.accountBalance = initialBalance;
         this.userAccount = userAccount;
+    }
 
+    @PreRemove
+    public void preRemove() {
+        this.userAccount.getAccounts().clear();
+        this.userAccount = null;
     }
 
     public Long getAccountId() {
