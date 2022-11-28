@@ -14,7 +14,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.example.budget.features.account.Account;
-import com.example.budget.features.transaction.category.Category;
+import com.example.budget.features.category.Category;
 import com.example.budget.features.transaction.payee.Payee;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

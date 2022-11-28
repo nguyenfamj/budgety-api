@@ -33,7 +33,7 @@ public class Account {
     private BigDecimal accountBalance;
 
     @JsonIgnore
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private UserAccount userAccount;
 

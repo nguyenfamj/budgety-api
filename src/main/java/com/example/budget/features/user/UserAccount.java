@@ -16,8 +16,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import com.example.budget.features.account.Account;
+import com.example.budget.features.category.Category;
 import com.example.budget.features.role.Role;
-import com.example.budget.features.transaction.category.Category;
 import com.example.budget.features.transaction.payee.Payee;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

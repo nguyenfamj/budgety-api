@@ -1,4 +1,4 @@
-package com.example.budget.features.transaction.category;
+package com.example.budget.features.category;
 
 import java.util.List;
 
@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import com.example.budget.features.budget.Budget;
 import com.example.budget.features.transaction.Transaction;
 import com.example.budget.features.user.UserAccount;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Category {
@@ -27,14 +28,15 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserAccount userAccount;
 
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "transactionId", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "transactionId", fetch = FetchType.EAGER)
     private List<Transaction> transactions;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "budgetId", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "category", fetch = FetchType.LAZY)
     private List<Budget> budgets;
 
     public Category() {
