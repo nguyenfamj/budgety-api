@@ -72,6 +72,10 @@ public class Account {
         return this.userAccount;
     }
 
+    public List<Transaction> getTransactions() {
+        return this.transactions;
+    }
+
     public void setAccountName(String accountName) {
         this.accountName = accountName;
     }

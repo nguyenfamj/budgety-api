@@ -10,8 +10,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PreRemove;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.example.budget.features.account.Account;
 import com.example.budget.features.category.Category;
@@ -27,6 +30,7 @@ public class Transaction {
 
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date transactionDate;
 
     @Column(nullable = false)
@@ -39,10 +43,12 @@ public class Transaction {
     @JoinColumn(name = "accountId")
     private Account account;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private Category category;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "payeeId")
     private Payee payee;
@@ -51,19 +57,34 @@ public class Transaction {
 
     }
 
-    public Transaction(Date transactionDate, BigDecimal amount, Account account, Category category) {
+    public Transaction(Date transactionDate, BigDecimal amount, Account account, Category category, Payee payee) {
         this.transactionDate = transactionDate;
         this.amount = amount;
         this.account = account;
         this.category = category;
+        this.payee = payee;
     }
 
-    public Transaction(Date transactionDate, BigDecimal amount, Account account, String note, Category category) {
+    public Transaction(Date transactionDate, BigDecimal amount, Account account, String note, Category category,
+            Payee payee) {
         this.transactionDate = transactionDate;
         this.amount = amount;
         this.account = account;
         this.category = category;
         this.note = note;
+        this.payee = payee;
+    }
+
+    @PreRemove
+    public void preRemove() {
+        this.account.getTransactions().clear();
+        this.category.getTransactions().clear();
+        this.payee.getTransactions().clear();
+
+        //
+        this.account = null;
+        this.category = null;
+        this.payee = null;
     }
 
     public Long getTransactionId() {
@@ -90,6 +111,10 @@ public class Transaction {
         return this.note;
     }
 
+    public Payee getPayee() {
+        return this.payee;
+    }
+
     public void setTransactionDate(Date transactionDate) {
         this.transactionDate = transactionDate;
     }
@@ -104,5 +129,13 @@ public class Transaction {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public void setPayee(Payee payee) {
+        this.payee = payee;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

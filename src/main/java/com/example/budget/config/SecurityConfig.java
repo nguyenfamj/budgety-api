@@ -27,12 +27,6 @@ import com.example.budget.services.UserDetails.UserDetailsServiceImpl;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // private final RsaKeyProperties rsaKeys;
-
-    // public SecurityConfig(RsaKeyProperties rsaKeys) {
-    // this.rsaKeys = rsaKeys;
-    // }
-
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
@@ -63,20 +57,6 @@ public class SecurityConfig {
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    // @Bean
-    // JwtDecoder jwtDecoder() {
-    // return NimbusJwtDecoder.withPublicKey(rsaKeys.publicKey()).build();
-    // }
-
-    // @Bean
-    // JwtEncoder jwtEncoder() {
-    // JWK jwk = new
-    // RSAKey.Builder(rsaKeys.publicKey()).privateKey(rsaKeys.privateKey()).build();
-    // JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-
-    // return new NimbusJwtEncoder(jwks);
-    // }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

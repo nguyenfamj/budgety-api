@@ -15,6 +15,7 @@ import javax.persistence.OneToMany;
 
 import com.example.budget.features.transaction.Transaction;
 import com.example.budget.features.user.UserAccount;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Payee {
@@ -26,11 +27,12 @@ public class Payee {
     @Column(nullable = false)
     private String name;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserAccount userAccount;
 
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "payee", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "payee", fetch = FetchType.EAGER)
     private List<Transaction> transactions;
 
     public Payee() {

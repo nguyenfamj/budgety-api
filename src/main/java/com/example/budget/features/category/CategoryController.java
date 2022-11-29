@@ -69,6 +69,7 @@ public class CategoryController {
     @PostMapping("")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryInfoRequest categoryInfoRequest) {
+
         // Get UserDetails from Security Context
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 

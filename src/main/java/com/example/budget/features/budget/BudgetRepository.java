@@ -22,5 +22,5 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
     Budget findByBudgetId(Long budgetId);
 
     @Transactional
-    List<Budget> deleteByBudgetId(Long budgetId);
+    Budget deleteByBudgetId(Long budgetId);
 }
