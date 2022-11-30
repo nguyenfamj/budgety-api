@@ -65,6 +65,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests(auth -> auth.antMatchers("/auth/login", "/auth/register").permitAll()
                         .anyRequest().authenticated());
+        http.requiresChannel().requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
+                .requiresSecure();
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtAuthTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 

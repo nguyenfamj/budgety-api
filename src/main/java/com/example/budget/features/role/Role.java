@@ -1,7 +1,5 @@
 package com.example.budget.features.role;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;

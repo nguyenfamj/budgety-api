@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  web:
+    image: 'budget:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://rootuser:rootpassword@db:5432/budget
+      - APP_JWT_COOKIE_NAME=budgetapp
+      - APP_JWT_SECRET_KEY=budgetappsecret123
+      - APP_JWT_EXPIRATION_TIME=8640000
+  db:
+    image: postgres:14.4-alpine
+    environment:
+      POSTGRES_USER: rootuser
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: budget
+    ports:
+      - '5432:5432'
+    volumes:
+      - budget-data:/var/lib/postgresql/data
+volumes:
+  budget-data:

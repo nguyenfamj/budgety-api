@@ -35,3 +35,4 @@ build/
 
 ### Private Resources ###
 src/main/resources/certs/
+.env
